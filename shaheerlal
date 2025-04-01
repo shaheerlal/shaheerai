@@ -67,3 +67,5 @@ export default function RiskAssessment() {
     </div>
   );
 }
+npm install gh-pages --save-dev
+
