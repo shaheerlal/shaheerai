@@ -1,0 +1,69 @@
+import { useState } from "react";
+
+const questions = [
+  { text: "What are the likely chances that this activity can cause anxiety?", weight: 0.2 },
+  { text: "How likely is this activity to exert happy hormones for me?", weight: -0.1 },
+  { text: "Have I done this activity before?", weight: -0.1 },
+  { text: "What is the value that this activity does not show any anxiety from previous experience?", weight: -0.1 },
+  { text: "Is this activity aligned with my principles?", weight: -0.05 },
+  { text: "Can this activity cause any financial losses?", weight: 0.2 },
+  { text: "What is the value that this specific activity can cause harm to others?", weight: 0.3 },
+  { text: "Is this activity physically safe for me?", weight: 0.15 },
+  { text: "Will this activity negatively impact my mental health in the long term?", weight: 0.15 },
+  { text: "Does this activity require skills I lack?", weight: 0.1 },
+  { text: "Will I regret doing this activity later?", weight: 0.1 },
+  { text: "Can this activity impact my reputation or relationships negatively?", weight: 0.15 },
+];
+
+export default function RiskAssessment() {
+  const [values, setValues] = useState(Array(questions.length).fill(""));
+
+  const handleChange = (index, value) => {
+    const newValues = [...values];
+    newValues[index] = value;
+    setValues(newValues);
+  };
+
+  const calculateRisk = () => {
+    let totalWeight = 0;
+    let weightedSum = 0;
+    
+    values.forEach((val, index) => {
+      const numVal = parseFloat(val) || 0;
+      weightedSum += numVal * questions[index].weight;
+      totalWeight += Math.abs(questions[index].weight);
+    });
+    
+    return totalWeight ? (weightedSum / totalWeight) : 0;
+  };
+
+  const riskScore = calculateRisk();
+  const riskCategory =
+    riskScore <= 40 ? "Safe to Proceed" : riskScore <= 70 ? "Caution Advised" : "High Risk, Reconsider";
+
+  return (
+    <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <h1 className="text-xl font-bold">Activity Risk Assessment</h1>
+      {questions.map((q, index) => (
+        <div key={index} className="flex flex-col space-y-2">
+          <label className="font-medium">{q.text}</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={values[index]}
+            onChange={(e) => handleChange(index, e.target.value)}
+            className="p-2 border rounded w-full"
+            placeholder="Enter value (0-100%)"
+          />
+        </div>
+      ))}
+      <div className="mt-4">
+        <h2 className="text-lg font-bold">Risk Score: {riskScore.toFixed(2)}%</h2>
+        <p className={`text-lg font-semibold ${riskCategory === "High Risk, Reconsider" ? "text-red-600" : riskCategory === "Caution Advised" ? "text-yellow-600" : "text-green-600"}`}>
+          {riskCategory}
+        </p>
+      </div>
+    </div>
+  );
+}
